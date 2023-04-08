@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+	
+<mapper namespace="com.study.springboot.dao.IAppGSDao">
+	<insert id="join">
+		insert into shopmember(mid, mpw, mname, memail, mpnum)
+		 values(#{param1},#{param2},#{param3},#{param4},#{param5})
+	</insert>	
+	<select id="login" resultType="com.study.springboot.dto.AppMemberDto">
+		select mId, mPw, mName, mPnum, mEmail, mBlack, enabled from shopmember where mId=#{param1}
+	</select>
+	<update id="modify">
+		update shopmember set mName=#{param2}, mEmail=#{param3}, mPnum=#{param4} where mId=#{param1}
+	</update>
+	<update id="modifyPW">
+		update shopmember set mPw=#{param2} where mId=#{param1}
+	</update>
+	
+	<!-- 주소지명 중복확인 -->
+	<select id="checkANameDuplicated" resultType="com.study.springboot.dto.AddressDto">
+		select * from memberAddress where mId=#{param1} and aName=#{param2}
+	</select>
+	
+	<!-- 주소 추가 -->
+	<insert id="addAddress">
+		insert into memberAddress
+		 values(#{param1},#{param2},#{param3},#{param4},#{param5},#{param6})
+	</insert>	
+	<update id="makeNotPrimary">
+		update memberaddress set aprimary=0 where mid=#{param1} and not aname=#{param2}
+	</update>
+
+	
+	<!-- 주소 목록 불러오기 -->
+	<select id="getAddressList" resultType="com.study.springboot.dto.AddressDto">
+		select * from memberaddress where mid=#{param1} order by aprimary desc, aName
+	</select>
+	<select id="findaName" resultType="com.study.springboot.dto.AddressDto">
+		select * from memberaddress where aname=#{param1}
+	</select>
+	<select id="findaPrimary" resultType="com.study.springboot.dto.AddressDto">
+		select * from memberaddress where mid=#{param1} and aPrimary = 1
+	</select>
+
+	
+	<!-- 주소 삭제 -->
+	<delete id="deleteAddress">
+		delete memberaddress where mid=#{param1} and aname=#{param2}
+	</delete>
+	
+	<!-- 주소 수정 -->
+	<update id="modifyAInfo">
+		update memberaddress set aname=#{param3}, azipcode=#{param4}, amain=#{param5}, asub=#{param6}, aprimary=#{param7} where mid=#{param1} and aname=#{param2}
+	</update>
+	
+	<!-- 문의 사항 -->
+	<insert id="writeQnA" parameterType="java.util.HashMap">
+		insert into shopqna (qId, mid, qTitle, qContent, qGroup, qphoto1, qphoto2, qphoto3)
+		values (SHOPQNA_SEQUENCE.nextval, #{mId}, #{qTitle}, #{qContent}, SHOPQNA_SEQUENCE.currval, #{file1}, #{file2}, #{file3})
+	</insert>
+	
+	<select id="getQnAList" resultType="com.study.springboot.dto.QnADto">
+		select * from shopqna where mid=#{mid} order by qId desc
+	</select>
+	
+	<delete id="deleteQnA">
+		delete shopqna where qid=#{param1}
+	</delete>
+	
+	<update id="modifyQnA">
+		update shopqna set qTitle=#{qTitle}, qContent=#{qContent}, qphoto1=#{file1}, qphoto2=#{file2}, qphoto3=#{file3} where qid=#{qId}
+	</update>
+	
+	<select id="getModifiedQnA" resultType="com.study.springboot.dto.QnADto">
+		select * from shopqna where qid=#{param1}
+	</select>	
+	
+	<!-- 구매 관련 -->
+	<insert id="addPaidInfo" parameterType="java.util.HashMap">
+		insert into shoppay (pid, mid, pcid, pcount, PADDRESS, PDELIVERYMEMO, totalprice)
+		values(shoppay_seq.nextval, #{mId}, #{pcid}, #{pcount}, #{paddress}, #{pdeliverymemo}, #{totalprice})
+	</insert>
+	
+	<select id="getPaidList" resultType="com.study.springboot.dto.PaidDto">
+		select * from shoppay order by pid desc
+	</select>
+	
+	
+	
+</mapper>
